@@ -1,443 +1,304 @@
-import pandas as pd
 import streamlit as st
 from streamlit_option_menu import option_menu
-
-pd.set_option('display.max_columns', None)
-import plotly.express as px
+import datetime
+import pandas as pd
+import numpy as np
+import seaborn as sns
+import matplotlib.pyplot as plt
 import warnings
 
 warnings.filterwarnings("ignore")
-import plotly.graph_objects as go
-import seaborn as sns
-import matplotlib.pyplot as plt
-from PIL import Image
-
-# Streamlit part
-
-st.set_page_config(layout="wide")
-st.title("AIRBNB DATA ANALYSIS")
-st.write("")
-
-
-def datafr():
-    df = pd.read_csv("C:/Users/Avinash bala/Desktop/New folder/df.csv")
-    return df
-
-df = datafr()
-
-with st.sidebar:
-    select = option_menu("Main Menu", ["Home", "Data Exploration", "About"])
-
-if select == "Home":
-    image1 = Image.open("C:/Users/Avinash bala/Desktop/New folder/Airbnb image.jpg")
-    st.image(image1)
-
-    st.header("About Airbnb")
-    st.write("")
-    st.write('''***Airbnb is an online marketplace that connects people who want to rent out
-              their property with people who are looking for accommodations,
-              typically for short stays. Airbnb offers hosts a relatively easy way to
-              earn some income from their property.Guests often find that Airbnb rentals
-              are cheaper and homier than hotels.***''')
-    st.write("")
-    st.write('''***Airbnb Inc (Airbnb) operates an online platform for hospitality services.
-                  The company provides a mobile application (app) that enables users to list,
-                  discover, and book unique accommodations across the world.
-                  The app allows hosts to list their properties for lease,
-                  and enables guests to rent or lease on a short-term basis,
-                  which includes vacation rentals, apartment rentals, homestays, castles,
-                  tree houses and hotel rooms. The company has presence in China, India, Japan,
-                  Australia, Canada, Austria, Germany, Switzerland, Belgium, Denmark, France, Italy,
-                  Norway, Portugal, Russia, Spain, Sweden, the UK, and others.
-                  Airbnb is headquartered in San Francisco, California, the US.***''')
-
-    st.header("Background of Airbnb")
-    st.write("")
-    st.write('''***Airbnb was born in 2007 when two Hosts welcomed three guests to their
-              San Francisco home, and has since grown to over 4 million Hosts who have
-                welcomed over 1.5 billion guest arrivals in almost every country across the globe.***''')
-
-if select == "Data Exploration":
-    tab1, tab2, tab3, tab4, tab5 = st.tabs(
-        ["***PRICE ANALYSIS***", "***AVAILABILITY ANALYSIS***", "***LOCATION BASED***",
-         "***GEOSPATIAL VISUALIZATION***", "***TOP CHARTS***"])
-    with tab1:
-        st.title("**PRICE DIFFERENCE**")
-        col1, col2 = st.columns(2)
-
-        with col1:
-            country = st.selectbox("Select the Country", df["country"].unique())
-
-            df1 = df[df["country"] == country]
-            df1.reset_index(drop=True, inplace=True)
-
-            room_ty = st.selectbox("Select the Room Type", df1["room_type"].unique())
-
-            df2 = df1[df1["room_type"] == room_ty]
-            df2.reset_index(drop=True, inplace=True)
-
-            df_bar = pd.DataFrame(df2.groupby("property_type")[["price", "review_scores", "number_of_reviews"]].sum())
-            df_bar.reset_index(inplace=True)
-
-            fig_bar = px.bar(df_bar, x='property_type', y="price", title="PRICE FOR PROPERTY_TYPES",
-                             hover_data=["number_of_reviews", "review_scores"],
-                             color_discrete_sequence=px.colors.sequential.Redor_r, width=600, height=500)
-            st.plotly_chart(fig_bar)
-
-        with col2:
-            st.write("")
-            st.write("")
-            st.write("")
-            st.write("")
-            st.write("")
-
-            proper_ty = st.selectbox("Select the Property_type", df2["property_type"].unique())
-
-            df4 = df2[df2["property_type"] == proper_ty]
-            df4.reset_index(drop=True, inplace=True)
-
-            df_pie = pd.DataFrame(df4.groupby("host_response_time")[["price", "bedrooms"]].sum())
-            df_pie.reset_index(inplace=True)
-
-            fig_pi = px.pie(df_pie, values="price", names="host_response_time",
-                            hover_data=["bedrooms"],
-                            color_discrete_sequence=px.colors.sequential.BuPu_r,
-                            title="PRICE DIFFERENCE BASED ON HOST RESPONSE TIME",
-                            width=600, height=500)
-            st.plotly_chart(fig_pi)
-
-        col1, col2 = st.columns(2)
-
-        with col1:
-            hostresponsetime = st.selectbox("Select the host_response_time", df4["host_response_time"].unique())
-
-            df5 = df4[df4["host_response_time"] == hostresponsetime]
-
-            df_do_bar = pd.DataFrame(df5.groupby("bed_type")[["minimum_nights", "maximum_nights", "price"]].sum())
-            df_do_bar.reset_index(inplace=True)
-
-            fig_do_bar = px.bar(df_do_bar, x='bed_type', y=['minimum_nights', 'maximum_nights'],
-                                title='MINIMUM NIGHTS AND MAXIMUM NIGHTS', hover_data="price",
-                                barmode='group', color_discrete_sequence=px.colors.sequential.Rainbow, width=600,
-                                height=500)
-
-            st.plotly_chart(fig_do_bar)
-
-        with col2:
-            st.write("")
-            st.write("")
-            st.write("")
-            st.write("")
-            st.write("")
-
-            df_do_bar_2 = pd.DataFrame(df5.groupby("bed_type")[["bedrooms", "beds", "accommodates", "price"]].sum())
-            df_do_bar_2.reset_index(inplace=True)
-
-            fig_do_bar_2 = px.bar(df_do_bar_2, x='bed_type', y=['bedrooms', 'beds', 'accommodates'],
-                                  title='BEDROOMS AND BEDS ACCOMMODATES', hover_data="price",
-                                  barmode='group', color_discrete_sequence=px.colors.sequential.Rainbow_r, width=600,
-                                  height=500)
-
-            st.plotly_chart(fig_do_bar_2)
-
-    with tab2:
-
-        def datafr():
-            df_a = pd.read_csv("C:/Users/Avinash bala/Desktop/New folder/df.csv")
-            return df_a
-
-
-        df_a = datafr()
-
-        st.title("**AVAILABILITY ANALYSIS**")
-        col1, col2 = st.columns(2)
-
-        with col1:
-            country_a = st.selectbox("Select the Country_a", df_a["country"].unique())
-
-            df1_a = df[df["country"] == country_a]
-            df1_a.reset_index(drop=True, inplace=True)
-
-            property_ty_a = st.selectbox("Select the Property Type", df1_a["property_type"].unique())
-
-            df2_a = df1_a[df1_a["property_type"] == property_ty_a]
-            df2_a.reset_index(drop=True, inplace=True)
-
-            df_a_sunb_30 = px.sunburst(df2_a, path=["room_type", "bed_type", "is_location_exact"],
-                                       values="availability_30", width=600, height=500, title="Availability_30",
-                                       color_discrete_sequence=px.colors.sequential.Peach_r)
-            st.plotly_chart(df_a_sunb_30)
-
-        with col2:
-            st.write("")
-            st.write("")
-            st.write("")
-            st.write("")
-            st.write("")
-            st.write("")
-            st.write("")
-            st.write("")
-            st.write("")
-            st.write("")
-
-            df_a_sunb_60 = px.sunburst(df2_a, path=["room_type", "bed_type", "is_location_exact"],
-                                       values="availability_60", width=600, height=500, title="Availability_60",
-                                       color_discrete_sequence=px.colors.sequential.Blues_r)
-            st.plotly_chart(df_a_sunb_60)
-
-        col1, col2 = st.columns(2)
-
-        with col1:
-            df_a_sunb_90 = px.sunburst(df2_a, path=["room_type", "bed_type", "is_location_exact"],
-                                       values="availability_90", width=600, height=500, title="Availability_90",
-                                       color_discrete_sequence=px.colors.sequential.Aggrnyl_r)
-            st.plotly_chart(df_a_sunb_90)
-
-        with col2:
-            df_a_sunb_365 = px.sunburst(df2_a, path=["room_type", "bed_type", "is_location_exact"],
-                                        values="availability_365", width=600, height=500, title="Availability_365",
-                                        color_discrete_sequence=px.colors.sequential.Greens_r)
-            st.plotly_chart(df_a_sunb_365)
-
-        roomtype_a = st.selectbox("Select the Room Type_a", df2_a["room_type"].unique())
-
-        df3_a = df2_a[df2_a["room_type"] == roomtype_a]
-
-        df_mul_bar_a = pd.DataFrame(df3_a.groupby("host_response_time")[
-                                        ["availability_30", "availability_60", "availability_90", "availability_365",
-                                         "price"]].sum())
-        df_mul_bar_a.reset_index(inplace=True)
-
-        fig_df_mul_bar_a = px.bar(df_mul_bar_a, x='host_response_time',
-                                  y=['availability_30', 'availability_60', 'availability_90', "availability_365"],
-                                  title='AVAILABILITY BASED ON HOST RESPONSE TIME', hover_data="price",
-                                  barmode='group', color_discrete_sequence=px.colors.sequential.Rainbow_r, width=1000)
-
-        st.plotly_chart(fig_df_mul_bar_a)
-
-    with tab3:
-
-        st.title("LOCATION ANALYSIS")
-        st.write("")
-
-
-        def datafr():
-            df = pd.read_csv("C:/Users/Avinash bala/Desktop/New folder/df.csv")
-            return df
-
-
-        df_l = datafr()
-
-        country_l = st.selectbox("Select the Country_l", df_l["country"].unique())
-
-        df1_l = df_l[df_l["country"] == country_l]
-        df1_l.reset_index(drop=True, inplace=True)
-
-        proper_ty_l = st.selectbox("Select the Property_type_l", df1_l["property_type"].unique())
-
-        df2_l = df1_l[df1_l["property_type"] == proper_ty_l]
-        df2_l.reset_index(drop=True, inplace=True)
-
-        st.write("")
-
-
-        def select_the_df(sel_val):
-            if sel_val == str(df2_l['price'].min()) + ' ' + str('to') + ' ' + str(
-                    differ_max_min * 0.30 + df2_l['price'].min()) + ' ' + str("(30% of the Value)"):
-
-                df_val_30 = df2_l[df2_l["price"] <= differ_max_min * 0.30 + df2_l['price'].min()]
-                df_val_30.reset_index(drop=True, inplace=True)
-                return df_val_30
-
-            elif sel_val == str(differ_max_min * 0.30 + df2_l['price'].min()) + ' ' + str('to') + ' ' + str(
-                    differ_max_min * 0.60 + df2_l['price'].min()) + ' ' + str("(30% to 60% of the Value)"):
-
-                df_val_60 = df2_l[df2_l["price"] >= differ_max_min * 0.30 + df2_l['price'].min()]
-                df_val_60_1 = df_val_60[df_val_60["price"] <= differ_max_min * 0.60 + df2_l['price'].min()]
-                df_val_60_1.reset_index(drop=True, inplace=True)
-                return df_val_60_1
-
-            elif sel_val == str(differ_max_min * 0.60 + df2_l['price'].min()) + ' ' + str('to') + ' ' + str(
-                    df2_l['price'].max()) + ' ' + str("(60% to 100% of the Value)"):
-
-                df_val_100 = df2_l[df2_l["price"] >= differ_max_min * 0.60 + df2_l['price'].min()]
-                df_val_100.reset_index(drop=True, inplace=True)
-                return df_val_100
-
-
-        differ_max_min = df2_l['price'].max() - df2_l['price'].min()
-
-        val_sel = st.radio("Select the Price Range", [str(df2_l['price'].min()) + ' ' + str('to') + ' ' + str(
-            differ_max_min * 0.30 + df2_l['price'].min()) + ' ' + str("(30% of the Value)"),
-
-                                                      str(differ_max_min * 0.30 + df2_l['price'].min()) + ' ' + str(
-                                                          'to') + ' ' + str(
-                                                          differ_max_min * 0.60 + df2_l['price'].min()) + ' ' + str(
-                                                          "(30% to 60% of the Value)"),
-
-                                                      str(differ_max_min * 0.60 + df2_l['price'].min()) + ' ' + str(
-                                                          'to') + ' ' + str(df2_l['price'].max()) + ' ' + str(
-                                                          "(60% to 100% of the Value)")])
-
-        df_val_sel = select_the_df(val_sel)
-
-        st.dataframe(df_val_sel)
-
-        # checking the correlation
-
-        df_val_sel_corr = df_val_sel.drop(columns=["listing_url", "name", "property_type",
-                                                   "room_type", "bed_type", "cancellation_policy",
-                                                   "images", "host_url", "host_name", "host_location",
-                                                   "host_response_time", "host_thumbnail_url",
-                                                   "host_response_rate", "host_is_superhost", "host_has_profile_pic",
-                                                   "host_picture_url", "host_neighbourhood",
-                                                   "host_identity_verified", "host_verifications",
-                                                   "street", "suburb", "government_area", "market",
-                                                   "country", "country_code", "location_type", "is_location_exact",
-                                                   "amenities"]).corr()
-
-        st.dataframe(df_val_sel_corr)
-
-        df_val_sel_gr = pd.DataFrame(
-            df_val_sel.groupby("accommodates")[["cleaning_fee", "bedrooms", "beds", "extra_people"]].sum())
-        df_val_sel_gr.reset_index(inplace=True)
-
-        fig_1 = px.bar(df_val_sel_gr, x="accommodates", y=["cleaning_fee", "bedrooms", "beds"], title="ACCOMMODATES",
-                       hover_data="extra_people", barmode='group',
-                       color_discrete_sequence=px.colors.sequential.Rainbow_r, width=1000)
-        st.plotly_chart(fig_1)
-
-        room_ty_l = st.selectbox("Select the Room_Type_l", df_val_sel["room_type"].unique())
-
-        df_val_sel_rt = df_val_sel[df_val_sel["room_type"] == room_ty_l]
-
-        fig_2 = px.bar(df_val_sel_rt, x=["street", "host_location", "host_neighbourhood"], y="market", title="MARKET",
-                       hover_data=["name", "host_name", "market"], barmode='group', orientation='h',
-                       color_discrete_sequence=px.colors.sequential.Rainbow_r, width=1000)
-        st.plotly_chart(fig_2)
-
-        fig_3 = px.bar(df_val_sel_rt, x="government_area",
-                       y=["host_is_superhost", "host_neighbourhood", "cancellation_policy"], title="GOVERNMENT_AREA",
-                       hover_data=["guests_included", "location_type"], barmode='group',
-                       color_discrete_sequence=px.colors.sequential.Rainbow_r, width=1000)
-        st.plotly_chart(fig_3)
-
-    with tab4:
-
-        st.title("GEOSPATIAL VISUALIZATION")
-        st.write("")
-
-        fig_4 = px.scatter_mapbox(df, lat='latitude', lon='longitude', color='price', size='accommodates',
-                                  color_continuous_scale="rainbow", hover_name='name', range_color=(0, 49000),
-                                  mapbox_style="carto-positron",
-                                  zoom=1)
-        fig_4.update_layout(width=1150, height=800, title='Geospatial Distribution of Listings')
-        st.plotly_chart(fig_4)
-
-    with tab5:
-
-        country_t = st.selectbox("Select the Country_t", df["country"].unique())
-
-        df1_t = df[df["country"] == country_t]
-
-        property_ty_t = st.selectbox("Select the Property_type_t", df1_t["property_type"].unique())
-
-        df2_t = df1_t[df1_t["property_type"] == property_ty_t]
-        df2_t.reset_index(drop=True, inplace=True)
-
-        df2_t_sorted = df2_t.sort_values(by="price")
-        df2_t_sorted.reset_index(drop=True, inplace=True)
-
-        df_price = pd.DataFrame(df2_t_sorted.groupby("host_neighbourhood")["price"].agg(["sum", "mean"]))
-        df_price.reset_index(inplace=True)
-        df_price.columns = ["host_neighbourhood", "Total_price", "Avarage_price"]
-
-        col1, col2 = st.columns(2)
-
-        with col1:
-            fig_price = px.bar(df_price, x="Total_price", y="host_neighbourhood", orientation='h',
-                               title="PRICE BASED ON HOST_NEIGHBOURHOOD", width=600, height=800)
-            st.plotly_chart(fig_price)
-
-        with col2:
-            fig_price_2 = px.bar(df_price, x="Avarage_price", y="host_neighbourhood", orientation='h',
-                                 title="AVERAGE PRICE BASED ON HOST_NEIGHBOURHOOD", width=600, height=800)
-            st.plotly_chart(fig_price_2)
-
-        col1, col2 = st.columns(2)
-
-        with col1:
-            df_price_1 = pd.DataFrame(df2_t_sorted.groupby("host_location")["price"].agg(["sum", "mean"]))
-            df_price_1.reset_index(inplace=True)
-            df_price_1.columns = ["host_location", "Total_price", "Avarage_price"]
-
-            fig_price_3 = px.bar(df_price_1, x="Total_price", y="host_location", orientation='h',
-                                 width=600, height=800, color_discrete_sequence=px.colors.sequential.Bluered_r,
-                                 title="PRICE BASED ON HOST_LOCATION")
-            st.plotly_chart(fig_price_3)
-
-        with col2:
-            fig_price_4 = px.bar(df_price_1, x="Avarage_price", y="host_location", orientation='h',
-                                 width=600, height=800, color_discrete_sequence=px.colors.sequential.Bluered_r,
-                                 title="AVERAGE PRICE BASED ON HOST_LOCATION")
-            st.plotly_chart(fig_price_4)
-
-        room_type_t = st.selectbox("Select the Room_Type_t", df2_t_sorted["room_type"].unique())
-
-        df3_t = df2_t_sorted[df2_t_sorted["room_type"] == room_type_t]
-
-        df3_t_sorted_price = df3_t.sort_values(by="price")
-
-        df3_t_sorted_price.reset_index(drop=True, inplace=True)
-
-        df3_top_50_price = df3_t_sorted_price.head(100)
-
-        fig_top_50_price_1 = px.bar(df3_top_50_price, x="name", y="price", color="price",
-                                    color_continuous_scale="rainbow",
-                                    range_color=(0, df3_top_50_price["price"].max()),
-                                    title="MINIMUM_NIGHTS MAXIMUM_NIGHTS AND ACCOMMODATES",
-                                    width=1200, height=800,
-                                    hover_data=["minimum_nights", "maximum_nights", "accommodates"])
-
-        st.plotly_chart(fig_top_50_price_1)
-
-        fig_top_50_price_2 = px.bar(df3_top_50_price, x="name", y="price", color="price",
-                                    color_continuous_scale="greens",
-                                    title="BEDROOMS, BEDS, ACCOMMODATES AND BED_TYPE",
-                                    range_color=(0, df3_top_50_price["price"].max()),
-                                    width=1200, height=800,
-                                    hover_data=["accommodates", "bedrooms", "beds", "bed_type"])
-
-        st.plotly_chart(fig_top_50_price_2)
-
-if select == "About":
-    st.header("ABOUT THIS PROJECT")
-
-    st.subheader(":orange[1. Data Collection:]")
-
-    st.write('''***Gather data from Airbnb's public API or other available sources.
-        Collect information on listings, hosts, reviews, pricing, and location data.***''')
-
-    st.subheader(":orange[2. Data Cleaning and Preprocessing:]")
-
-    st.write('''***Clean and preprocess the data to handle missing values, outliers, and ensure data quality.
-        Convert data types, handle duplicates, and standardize formats.***''')
-
-    st.subheader(":orange[3. Exploratory Data Analysis (EDA):]")
-
-    st.write('''***Conduct exploratory data analysis to understand the distribution and patterns in the data.
-        Explore relationships between variables and identify potential insights.***''')
-
-    st.subheader(":orange[4. Visualization:]")
-
-    st.write('''***Create visualizations to represent key metrics and trends.
-        Use charts, graphs, and maps to convey information effectively.
-        Consider using tools like Matplotlib, Seaborn, or Plotly for visualizations.***''')
-
-    st.subheader(":orange[5. Geospatial Analysis:]")
-
-    st.write('''***Utilize geospatial analysis to understand the geographical distribution of listings.
-        Map out popular areas, analyze neighborhood characteristics, and visualize pricing variations.***''')
+import pickle
+
+from sklearn.preprocessing import StandardScaler, LabelEncoder
+
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import ExtraTreesRegressor
+from sklearn.tree import DecisionTreeRegressor
+from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
+from sklearn.preprocessing import StandardScaler, LabelEncoder
+
+from sklearn.svm import SVC
+from sklearn.ensemble import RandomForestClassifier
+
+from sklearn.metrics import accuracy_score
+
+# --------------------------------------------------------------------------------------------------------------------------------------
+
+# page congiguration
+st.set_page_config(page_title="Copper Modelling",
+                   page_icon='random',
+                   layout="wide", )
+
+st.markdown("<h1 style='text-align: center; color: blue;'>WELCOME TO INDUSTRIAL COPPER MODELLING</h1>",
+            unsafe_allow_html=True)
+
+selected = option_menu(None, ['HOME', "PRICE PREDICTION", "STATUS PREDICTION", "CONCLUSION"],
+                       icons=["house", 'cash-coin', 'trophy', "check-circle"], orientation='horizontal',
+                       default_index=0)
+
+# Home
+
+if selected == 'HOME':
+    b1, b2 = st.columns(2)
+    with b1:
+        st.write('## **Problem Statement**')
+        st.write(
+            '* The copper industry deals with less complex data related to sales and pricing.Where the copper industry faces challenges is in capturing the leads. A lead classification model is a system for evaluating and classifying leads based on how likely they are to become a customer')
+        st.write('* ML Regression model which predicts continuous variable :violet[**‘Selling_Price’**].')
+        st.write('* ML Classification model which predicts Status: :green[**WON**] or :red[**LOST**].')
+        st.write('## Tools and Technologies used')
+        st.write('Python, Streamlit, NumPy, Pandas, Scikit-learn, Matplotlib, Seaborn, Pickle, Streamlit-Option-Menu')
+
+    with b2:
+        st.write('## **USING MACHINE LEARNING**')
+
+        # st.write("### ML MODELS USED")
+        st.write('#### REGRESSION - ***:red[ExtraTreeRegressor]***')
+        st.write(
+            '- Extra tree regressor is an ensemble supervised machine learning method that uses decision trees. It divide the data into subsets, that is, branches, nodes, and leaves. Like decision trees, regression trees select splits that decrease the dispersion of target attribute values. Thus, the target attribute values can be predicted from their mean values in the leaves.')
+        st.write('#### CLASSIFICATION - ***:violet[RandomForestClassification]***')
+        st.write(
+            '- Random forest is a commonly-used machine learning algorithm trademarked by Leo Breiman and Adele Cutler, which combines the output of multiple decision trees to reach a single result. Its ease of use and flexibility have fueled its adoption.')
+
+# Price Prediction
+
+if selected == 'PRICE PREDICTION':
+    try:
+        if 'PRICE PREDICTION':
+            item_list = ['W', 'S', 'Others', 'PL', 'WI', 'IPL']
+            status_list = ['Won', 'To be approved', 'Lost', 'Not lost for AM', 'Wonderful', 'Revised', 'Offered',
+                           'Offerable']
+            country_list = ['28', '32', '38', '78', '27', '30', '25', '77', '39', '40', '26', '84', '80', '79', '113',
+                            '89']
+            application_list = [10, 41, 28, 59, 15, 4, 38, 56, 42, 26, 27, 19, 20, 66,
+                                29, 22, 40, 25, 67, 79, 3, 99, 2, 5, 39, 69, 70, 65, 58, 68]
+
+            product_list = [1670798778, 1668701718, 628377, 640665, 611993, 1668701376,
+                            164141591, 1671863738, 1332077137, 640405, 1693867550, 1665572374,
+                            1282007633, 1668701698, 628117, 1690738206, 628112, 640400,
+                            1671876026, 164336407, 164337175, 1668701725, 1665572032, 611728,
+                            1721130331, 1693867563, 611733, 1690738219, 1722207579, 929423819,
+                            1665584320, 1665584662, 1665584642]
+            st.write(
+                '##### ***<span style="color:black">Fill all the fields and Press the below button to view the :red[Pedicted price]   of copper</span>***',
+                unsafe_allow_html=True)
+
+            c1, c2, c3 = st.columns([2, 2, 2])
+            with c1:
+                quantity = st.text_input('**Enter Quantity  (Min:611728 & Max:1722207579) in tons**')
+                thickness = st.text_input('**Enter Thickness (Min:0.18 & Max:400)**')
+                width = st.text_input('**Enter Width  (Min:1 & Max:2990)**')
+
+            with c2:
+                country = st.selectbox('**Country Code**', country_list)
+                status = st.selectbox('**Status**', status_list)
+                item = st.selectbox('**Item Type**', item_list)
+
+            with c3:
+                application = st.selectbox('**Application Type**', application_list)
+                product = st.selectbox('**Product Reference**', product_list)
+                item_order_date = st.date_input("**Order Date**", datetime.date(2020, 7, 20))
+                item_delivery_date = st.date_input("**Estimated Delivery Date**", datetime.date(2021, 12, 1))
+            with c1:
+                st.write('')
+                st.write('')
+                st.write('')
+                if st.button('PREDICT PRICE'):
+                    data = []
+                    with open('country.pkl', 'rb') as file:
+                        encode_country = pickle.load(file)
+                    with open('status.pkl', 'rb') as file:
+                        encode_status = pickle.load(file)
+                    with open('item type.pkl', 'rb') as file:
+                        encode_item = pickle.load(file)
+                    with open('scaling.pkl', 'rb') as file:
+                        scaled_data = pickle.load(file)
+
+                    with open('ExtraTreeRegressor.pkl', 'rb') as f:
+                        model = pickle.load(f)
+
+                    encode = LabelEncoder()
+                    encode_country = encode.fit(country_list)
+
+                    transformed_country = encode_country.transform(country_list)
+                    encoded_ct = None
+                    for i, j in zip(country_list, transformed_country):
+                        if country == i:
+                            encoded_ct = j
+                            break
+                    else:
+                        st.error("Country not found.")
+                        exit()
+
+                    encode = LabelEncoder()
+                    encode_status = encode.fit(status_list)
+
+                    transformed_status = encode_status.transform(status_list)
+                    encode_st = None
+                    for i, j in zip(status_list, transformed_status):
+                        if status == i:
+                            encode_st = j
+                            break
+                    else:
+                        st.error("Status not found.")
+                        exit()
+
+                    encode = LabelEncoder()
+                    encode_item = encode.fit(item_list)
+
+                    transformed_item = encode_item.transform(item_list)
+                    encode_it = None
+                    for i, j in zip(item_list, transformed_item):
+                        if item == i:
+                            encode_it = j
+                            break
+                    else:
+                        st.error("Item type not found.")
+                        exit()
+
+                    order = datetime.datetime.strptime(str(item_order_date), "%Y-%m-%d")
+                    delivery = datetime.datetime.strptime(str(item_delivery_date), "%Y-%m-%d")
+                    day = delivery - order
+
+                    data.append(quantity)
+                    data.append(thickness)
+                    data.append(width)
+                    data.append(encoded_ct)
+                    data.append(encode_st)
+                    data.append(encode_it)
+                    data.append(application)
+                    data.append(product)
+                    data.append(day.days)
+
+                    x = np.array(data).reshape(1, -1)
+                    pred_model = scaled_data.transform(x)
+                    price_predict = model.predict(pred_model)
+                    predicted_price = str(price_predict)[1:-1]
+
+                    st.success(f'**Predicted Selling Price : :green[₹] :green[{predicted_price}]**')
+
+    except:
+        st.error('Please enter values in empty cells')
+
+#  Status Prediction
+
+if selected == 'STATUS PREDICTION':
+    try:
+        if 'STATUS PREDICTION':
+            item_list_cls = ['W', 'S', 'Others', 'PL', 'WI', 'IPL']
+            country_list_cls = ['28', '32', '38', '78', '27', '30', '25', '77', '39', '40', '26', '84', '80', '79',
+                                '113', '89']
+            application_list_cls = [10, 41, 28, 59, 15, 4, 38, 56, 42, 26, 27, 19, 20, 66,
+                                    29, 22, 40, 25, 67, 79, 3, 99, 2, 5, 39, 69, 70, 65, 58, 68]
+            product_list_cls = [1670798778, 1668701718, 628377, 640665, 611993, 1668701376,
+                                164141591, 1671863738, 1332077137, 640405, 1693867550, 1665572374,
+                                1282007633, 1668701698, 628117, 1690738206, 628112, 640400,
+                                1671876026, 164336407, 164337175, 1668701725, 1665572032, 611728,
+                                1721130331, 1693867563, 611733, 1690738219, 1722207579, 929423819,
+                                1665584320, 1665584662, 1665584642]
+
+            st.write(
+                '##### ***<span style="color:GREEN">Fill all the fields and Press the below button to view the status :violet[WON] / :red[LOST] of copper in the desired time range</span>***',
+                unsafe_allow_html=True)
+
+            cc1, cc2, cc3 = st.columns([2, 2, 2])
+            with cc1:
+                quantity_cls = st.text_input('ENTER QUANTITY  (Min:611728 & Max:1722207579) in tons')
+                thickness_cls = st.text_input('ENTER THICKNESS (Min:0.18 & Max:400)')
+                width_cls = st.text_input('ENTER WIDTH  (Min:1 & Max:2990)')
+
+            with cc2:
+                selling_price_cls = st.text_input('ENTER SELLING PRICE  (Min:1, Max:100001015)')
+                item_cls = st.selectbox('ITEM TYPE', item_list_cls)
+                country_cls = st.selectbox('COUNTRY CODE', country_list_cls)
+
+            with cc3:
+                application_cls = st.selectbox('APLLICATION TYPE', application_list_cls)
+                product_cls = st.selectbox('PRODUCT REFERENCE', product_list_cls)
+                item_order_date_cls = st.date_input("ORDER DATE", datetime.date(2020, 7, 20))
+                item_delivery_date_cls = st.date_input("ESTIMATED DELIVERY DATE", datetime.date(2022, 12, 1))
+
+            with cc1:
+                st.write('')
+                st.write('')
+                st.write('')
+                if st.button('PREDICT STATUS'):
+                    data_cls = []
+                    with open('country.pkl', 'rb') as file:
+                        encode_country_cls = pickle.load(file)
+                    with open('item type.pkl', 'rb') as file:
+                        encode_item_cls = pickle.load(file)
+                    with open('scaling_classify.pkl', 'rb') as file:
+                        scaled_data_cls = pickle.load(file)
+                    with open('RandomForestClassification.pkl', 'rb') as file:
+                        trained_model_cls = pickle.load(file)
+
+                    encode = LabelEncoder()
+                    encode_country_cls = encode.fit(country_list_cls)
+
+                    transformed_country_cls = encode_country_cls.transform(country_list_cls)
+                    encoded_ct_cls = None
+                    for i, j in zip(country_list_cls, transformed_country_cls):
+                        if country_cls == i:
+                            encoded_ct_cls = j
+                            break
+                    else:
+                        st.error("Country not found.")
+                        exit()
+
+                    encode = LabelEncoder()
+                    encode_item_cls = encode.fit(item_list_cls)
+
+                    transformed_item_cls = encode_item_cls.transform(item_list_cls)
+                    encode_it_cls = None
+                    for i, j in zip(item_list_cls, transformed_item_cls):
+                        if item_cls == i:
+                            encode_it_cls = j
+                            break
+                    else:
+                        st.error("Item type not found.")
+                        exit()
+
+                    order_cls = datetime.datetime.strptime(str(item_order_date_cls), "%Y-%m-%d")
+                    delivery_cls = datetime.datetime.strptime(str(item_delivery_date_cls), "%Y-%m-%d")
+                    day_cls = delivery_cls - order_cls
+
+                    data_cls.append(quantity_cls)
+                    data_cls.append(thickness_cls)
+                    data_cls.append(width_cls)
+                    data_cls.append(selling_price_cls)
+                    data_cls.append(encoded_ct_cls)
+                    data_cls.append(encode_it_cls)
+                    data_cls.append(application_cls)
+                    data_cls.append(product_cls)
+                    data_cls.append(day_cls.days)
+
+                    x_cls = np.array(data_cls).reshape(1, -1)
+                    scaling_model_cls = scaled_data_cls.transform(x_cls)
+                    pred_status = trained_model_cls.predict(scaling_model_cls)
+                    if pred_status == 6:
+                        st.success(f'**Predicted Status : :green[WON]**')
+                    else:
+                        st.error(f'**Predicted Status : :blue[LOST]**')
+
+    except:
+        st.error("Please enter values in empty cells")
+
+if selected == 'CONCLUSION':
+    st.markdown("## :violet[My Conclusion]")
+
+    st.write('## Price and Status of copper is depend on many of the following :')
+    st.write(
+        "* Copper is often considered a barometer of economic health. Economic growth tends to increase demand for copper in construction, manufacturing, and infrastructure projects.")
+    st.write(
+        '* The growing :red[**adoption of electric vehicles (EVs)**] and renewable energy technologies, such as :red[**solar**] and :red[**wind**], can influence copper demand due to its use in wiring and components.')
+    st.write(
+        '* Technological advancements that increase the efficiency of copper usage or lead to the development of new applications can impact demand.')
+    st.write(
+        '* Keep an eye on :violet[**trade policies, tariffs**], and :violet[**geopolitical events**] that may impact the flow of copper between countries. Changes in global trade dynamics can affect prices.  ')
+    st.write(
+        '* Utilize advanced :orange[**predictive modeling techniques**], such as :orange[**machine learning algorithms**], to analyze historical data and identify patterns that may assist in forecasting future copper trends. ')
 
 
 
